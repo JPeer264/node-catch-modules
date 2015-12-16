@@ -1,0 +1,14 @@
+{
+  "name": "find-module",
+  "version": "0.0.1",
+  "description": "find a global module or a local one by name or package.json name",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm test"
+  },
+  "author": "Jan Peer Stöcklmair",
+  "license": "MIT",
+  "dependencies": {
+    "lodash": "^3.10.1"
+  }
+}
