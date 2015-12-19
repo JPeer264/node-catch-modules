@@ -75,7 +75,6 @@ exports.byNameSync = function (isGlobal, keyword) {
  */
 exports.byDependency = function (isGlobal, keyword, cb) {
     var pathname = pathToLocalModules;
-    var packageResult = [];
     var result = [];
 
     if (typeof keyword !== 'string') {
@@ -100,6 +99,7 @@ exports.byDependency = function (isGlobal, keyword, cb) {
         _.forEach(list, function(value, key) {
             functionArray.push(
                 function(callback) {
+                    var packageResult = [];
                     var subpathname = path.join(pathname, value);
 
                     fs.readdir(subpathname, function(err, filesInDir) {
@@ -110,7 +110,8 @@ exports.byDependency = function (isGlobal, keyword, cb) {
                         if (filesInDir.length === 0) {
                             files = null;
                         }
-
+                        // console.log('dir', value);
+                        // console.log('files', filesInDir);
                         // read package.json
                         if (value.charAt(0) !== '.') {
                             json.readToObj(path.join(subpathname, 'package.json'), function(data, err) {
@@ -131,8 +132,7 @@ exports.byDependency = function (isGlobal, keyword, cb) {
                 }
             );
         });
-    
-        // todo get doubles
+
         // loop through fs.readdir array
         async.parallel(functionArray, function(err, data) {
             if (err) return;
