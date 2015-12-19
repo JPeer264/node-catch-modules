@@ -22,9 +22,11 @@ var dependencies = [
 /**
  * catch modules by name
  *
- * @param isGlobal {boolean} global modules?
- * @param keyword  {String} by what should it be filtered
+ * @param isGlobal {boolean}  global modules?
+ * @param keyword  {String}   by what should it be filtered
  * @param cb       {Function} callback
+ *
+ * @return cb      {Function} return an array with objects in it - found modules
  */
 exports.byName = function (isGlobal, keyword, cb) {
     var pathname = pathToLocalModules;
@@ -53,6 +55,8 @@ exports.byName = function (isGlobal, keyword, cb) {
  *
  * @param isGlobal {boolean} global modules?
  * @param keyword  {String} by what should it be filtered
+ *
+ * @return {Array} return an array with objects in it - found modules
  */
 exports.byNameSync = function (isGlobal, keyword) {
     var pathname = pathToLocalModules;
@@ -71,7 +75,17 @@ exports.byNameSync = function (isGlobal, keyword) {
 
 
 /**
- * todo search by dependencies in package.json
+ * search dependencies by name in node_modules
+ *
+ * @param isGlobal {boolean} global modules?
+ * @param keyword  {String} by what should it be filtered
+ * @param cb       {Function} callback
+ *
+ * @return cb
+ *
+ * todo add options
+ * todo add option to look in dev, peer or normal dependencies
+ * todo add option to have a custom path
  */
 exports.byDependency = function (isGlobal, keyword, cb) {
     var pathname = pathToLocalModules;
@@ -84,12 +98,6 @@ exports.byDependency = function (isGlobal, keyword, cb) {
     }
 
     pathname = isGlobal ? pathToGlobalModules : pathname;
-
-    // todo search modules
-    // todo go into modules
-    // todo seach for package.json
-    // read package.json
-    // search for keyword in dependencies
 
     fs.readdir(pathname, function(err, list) {
         var functionArray = [];
@@ -142,11 +150,52 @@ exports.byDependency = function (isGlobal, keyword, cb) {
 }
 
 /**
+ * search dependencies by name in node_modules - sync
+ *
+ * @param isGlobal {boolean} global modules?
+ * @param keyword  {String} by what should it be filtered
+ *
+ * @return cb
+ *
+ * todo add options
+ * todo add option to look in dev, peer or normal dependencies
+ * todo add option to have a custom path
+ */
+exports.byDependencySync = function (isGlobal, keyword, cb) {
+    // todo go into modules
+    // todo seach for package.json
+    // read package.json
+    // search for keyword in dependencies
+    var pathname = pathToLocalModules;
+    var result = [];
+    var dir;
+    var newPath;
+
+    if (typeof keyword !== 'string') {
+        cb = keyword;
+        keyword = isGlobal;
+        isGlobal = false;
+    }
+
+    pathname = isGlobal ? pathToGlobalModules : pathname;
+
+    dir = fs.readdirSync(pathname);
+
+    _.forEach(dir, function(value, key) {
+        // newPath = path.join(pathname, value)
+        // console.log(path.join(pathname, value));
+        console.log(json.readToObjSync(path.join(pathname, value)));
+    });
+}
+
+/**
  * filter by keyword
  *
  * @param array    {Object} which array should be filtered
  * @param keyword  {String} by what should it be filtered
  * @param pathname {String} where is node_modules
+ *
+ * @return result  {Array}  array with objects in it - filtered by name, keyword and path
  */
 function filter(array, keyword, pathname) {
     var result = [];
@@ -169,6 +218,8 @@ function filter(array, keyword, pathname) {
  * @param array    {Object} which array should be filtered
  * @param keyword  {String} by what should it be filtered
  * @param pathname {String} where is node_modules
+ *
+ * @return result  {Array}  array with objects in it - filtered by name, module, keyword, path and rootpath
  */
 function filterDependencies(array, keyword, pathname, dependencyType) {
     var result = [];
