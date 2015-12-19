@@ -33,7 +33,7 @@ exports.byName = function (isGlobal, keyword, cb) {
     if (typeof keyword !== 'string') {
         cb = keyword;
         keyword = isGlobal;
-        isGlobal = true;
+        isGlobal = false;
     }
 
     if (isGlobal) {
@@ -81,7 +81,7 @@ exports.byDependency = function (isGlobal, keyword, cb) {
     if (typeof keyword !== 'string') {
         cb = keyword;
         keyword = isGlobal;
-        isGlobal = true;
+        isGlobal = false;
     }
 
     pathname = isGlobal ? pathToGlobalModules : pathname;
@@ -102,12 +102,12 @@ exports.byDependency = function (isGlobal, keyword, cb) {
                 function(callback) {
                     var subpathname = path.join(pathname, value);
 
-                    fs.readdir(subpathname, function(err, data) {
-                        var files = data.filter(function(value) {
+                    fs.readdir(subpathname, function(err, filesInDir) {
+                        var files = filesInDir.filter(function(value) {
                             return !value.indexOf('package.json');
                         });
 
-                        if (files.length === 0) {
+                        if (filesInDir.length === 0) {
                             files = null;
                         }
 
@@ -115,24 +115,27 @@ exports.byDependency = function (isGlobal, keyword, cb) {
                         if (value.charAt(0) !== '.') {
                             json.readToObj(path.join(subpathname, 'package.json'), function(data, err) {
                                 if (err) return;
-
                                 if (data.dependencies) {
                                     packageResult.push(filterDependencies(data.dependencies, keyword, subpathname));
-                                    callback(null, packageResult);
+
+                                    callback(null, _.flatten(packageResult));
                                 } else {
                                     callback(null, []);
                                 }
                             });
+                        } else {
+                            // e.g. .bin could not be read -> give empty array
+                            callback(null, []);
                         }
                     });
                 }
             );
         });
-
-        // todo doesnt work
+    
+        // todo get doubles
         // loop through fs.readdir array
         async.parallel(functionArray, function(err, data) {
-            console.log('data');
+            if (err) return;
             return cb(err, _.flattenDeep(data));
         });
     });
