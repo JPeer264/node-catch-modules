@@ -1,18 +1,21 @@
 'use strict';
 // modules
 var fs = require('fs'),
+    os = require('os'),
     path = require('path'),
     _ = require('lodash'),
     json = require('json-extra'),
     async = require('async');
 
-var pathToGlobalModules = path.join(process.env.APPDATA, 'npm/node_modules');
+var globalNodePath = os.platform() === 'win32' ? process.env.APPDATA + '/npm' : process.env._ + '/lib';
+var pathToGlobalModules = path.join(globalNodePath, 'node_modules');
 var pathToLocalModules = path.join(process.cwd(), 'node_modules');
 var dependencies = [
     'devDependencies',
     'dependencies',
     'peerDependencies'
 ];
+
 // todo get list of npm packages by name
 // todo get list of npm packages by packages.json depenency name
 // todo either global or local -> boolean, true = global
@@ -155,21 +158,17 @@ exports.byDependency = function (isGlobal, keyword, cb) {
  * @param isGlobal {boolean} global modules?
  * @param keyword  {String} by what should it be filtered
  *
- * @return cb
+ * @return result {Object}
  *
  * todo add options
  * todo add option to look in dev, peer or normal dependencies
  * todo add option to have a custom path
  */
 exports.byDependencySync = function (isGlobal, keyword, cb) {
-    // todo go into modules
-    // todo seach for package.json
-    // read package.json
-    // search for keyword in dependencies
     var pathname = pathToLocalModules;
     var result = [];
     var dir;
-    var newPath;
+    var subpathname;
 
     if (typeof keyword !== 'string') {
         cb = keyword;
@@ -180,12 +179,19 @@ exports.byDependencySync = function (isGlobal, keyword, cb) {
     pathname = isGlobal ? pathToGlobalModules : pathname;
 
     dir = fs.readdirSync(pathname);
-
     _.forEach(dir, function(value, key) {
-        // newPath = path.join(pathname, value)
-        // console.log(path.join(pathname, value));
-        console.log(json.readToObjSync(path.join(pathname, value)));
+        subpathname = path.join(pathname, value);
+
+        if (value.charAt(0) !== '.') {
+            var data = json.readToObjSync(path.join(subpathname, 'package.json'));
+
+            if (data.dependencies) {
+                result.push(filterDependencies(data.dependencies, keyword, subpathname));
+            }
+        }
     });
+
+    return _.flatten(result);
 }
 
 /**
