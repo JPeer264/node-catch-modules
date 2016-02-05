@@ -16,12 +16,6 @@ var dependencies = [
     'peerDependencies'
 ];
 
-// todo get list of npm packages by name
-// todo get list of npm packages by packages.json depenency name
-// todo either global or local -> boolean, true = global
-
-// todo return "name", "path"
-
 /**
  * catch modules by name
  *
