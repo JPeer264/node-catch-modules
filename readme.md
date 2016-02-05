@@ -12,7 +12,7 @@ npm install catch-modules --save
 var findModule = require('catch-modules')
 
 findModule.byName('abc', function(err, data) {
-	if (err) return console.log(err)
+    if (err) return console.log(err)
     console.log('There is your data: ', data)
 })
 ```
@@ -35,13 +35,13 @@ Example:
 var findModule = require('catch-modules')
 
 findModule.byName('async', function(err, data) {
-	if (err) return console.log(err)
-	console.log('There is your data: ', data)
+    if (err) return console.log(err)
+    console.log('There is your data: ', data)
 }) // searches in project node_modules
 
 findModule.byName(true, 'async', function(err, data) {
-	if (err) return console.log(err)
-	console.log('There is your data: ', data)
+    if (err) return console.log(err)
+    console.log('There is your data: ', data)
 }) // searches in global node_modules
 ```
 
@@ -96,7 +96,6 @@ Example:
 
 ```js
 var findModule = require('catch-modules')
-
 
 try {
     findModule.byDependencySync('async') // searches in project node_modules
