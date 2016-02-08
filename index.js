@@ -108,6 +108,11 @@ exports.byDependency = function (isGlobal, keyword, cb) {
                     var subpathname = path.join(pathname, value);
 
                     fs.readdir(subpathname, function(err, filesInDir) {
+
+                        if (filesInDir === undefined) {
+                            filesInDir = [];
+                        }
+
                         var files = filesInDir.filter(function(value) {
                             return !value.indexOf('package.json');
                         });

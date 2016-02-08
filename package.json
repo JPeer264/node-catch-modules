@@ -4,7 +4,7 @@
   "description": "find a global module or a local one by name or package.json name",
   "main": "index.js",
   "scripts": {
-    "test": "npm test"
+    "test": "mocha test"
   },
   "author": "Jan Peer Stöcklmair",
   "license": "MIT",
@@ -14,7 +14,9 @@
     "lodash": "^3.10.1"
   },
   "devDependencies": {
+    "catch-modules-test": "0.0.3",
     "chai": "^3.4.1",
+    "grunt": "^0.4.5",
     "mocha": "^2.3.4"
   }
 }
