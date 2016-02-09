@@ -26,7 +26,7 @@ describe('+byNameSync', function () {
     });
 
     it('should find a global module', function (done) {
-        expect(findModules.byNameSync(true, testDependency).length).to.equal(1);
+        expect(findModules.byNameSync(true, 'a')).to.have.length.at.least(1);
 
         done();
     });
@@ -91,7 +91,7 @@ describe('+byDependencySync', function () {
     });
 
     it('should find a global module', function (done) {
-        expect(findModules.byDependencySync(true, testDependency).length).to.equal(1);
+        expect(findModules.byDependencySync(true, 'a')).to.have.length.at.least(1);
 
         done();
     });

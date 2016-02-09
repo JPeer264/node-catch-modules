@@ -5,10 +5,10 @@ var fs = require('fs'),
     path = require('path'),
     _ = require('lodash'),
     json = require('json-extra'),
+    execSync = require('child_process').execSync,
     async = require('async');
 
-var globalNodePath = os.platform() === 'win32' ? process.env.APPDATA + '/npm' : process.env._ + '/lib';
-var pathToGlobalModules = path.join(globalNodePath, 'node_modules');
+var pathToGlobalModules = os.platform() === 'win32' ? path.join(process.env.APPDATA, 'npm/node_modules') : execSync('npm root -g').toString().replace(/\s$/,'');
 var pathToLocalModules = path.join(process.cwd(), 'node_modules');
 var dependencies = [
     'devDependencies',
@@ -47,6 +47,7 @@ exports.byName = function (isGlobal, keyword, cb) {
     });
 }
 
+
 /**
  * catch modules by name - sync version
  *
@@ -69,7 +70,6 @@ exports.byNameSync = function (isGlobal, keyword) {
 
     return filter(fs.readdirSync(pathname), keyword, pathname);
 }
-
 
 /**
  * search dependencies by name in node_modules
@@ -102,10 +102,16 @@ exports.byDependency = function (isGlobal, keyword, cb) {
         // loop through node_modules folder, check if there is a package.json
         // return null if no package.json is found
         _.forEach(list, function(value, key) {
+            
+            
             functionArray.push(
                 function(callback) {
                     var packageResult = [];
                     var subpathname = path.join(pathname, value);
+
+                    if (!fs.lstatSync(subpathname).isDirectory()) {
+                        return callback(null, []);
+                    }
 
                     fs.readdir(subpathname, function(err, filesInDir) {
 
@@ -125,7 +131,7 @@ exports.byDependency = function (isGlobal, keyword, cb) {
                         // read package.json
                         if (value.charAt(0) !== '.') {
                             json.readToObj(path.join(subpathname, 'package.json'), function(data, err) {
-                                if (err) return;
+                                if (err) return callback(null, []);
                                 if (data.dependencies) {
                                     packageResult.push(filterDependencies(data.dependencies, keyword, subpathname));
 
@@ -181,7 +187,7 @@ exports.byDependencySync = function (isGlobal, keyword, cb) {
     _.forEach(dir, function(value, key) {
         subpathname = path.join(pathname, value);
 
-        if (value.charAt(0) !== '.') {
+        if (value.charAt(0) !== '.' && fs.lstatSync(subpathname).isDirectory()) {
             var data = json.readToObjSync(path.join(subpathname, 'package.json'));
 
             if (data.dependencies) {
