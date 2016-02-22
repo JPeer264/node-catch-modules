@@ -18,7 +18,7 @@ findModule.byName('abc', function(err, data) {
 ```
 
 ## Methods
-- [byName](#byName)
+- [byName](#byName)
 - [byNameSync](#byNameSync)
 - [byDependency](#byDependency)
 - [byDependencySync](#byDependencySync)
